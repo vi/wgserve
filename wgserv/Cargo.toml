@@ -1,0 +1,26 @@
+[package]
+name = "wgserv"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name="wgserv"
+crate-type=["cdylib"]
+
+[dependencies]
+jni = "0.21.1"
+serde = { version = "1.0.183", features = ["derive"] }
+toml = { version = "0.7.6" }
+tracing = "0.1.37"
+tracing-android = "0.2.0"
+tracing-subscriber = { version = "0.3.17", default-features = false, features = ["std", "registry"] }
+
+[profile.release]
+opt-level = "s"
+debug = 1
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+incremental = false
+panic = 'abort'

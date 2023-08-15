@@ -15,14 +15,21 @@
         <Button
             android:id="@+id/bStart"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30pt"
             android:text="Start" />
 
         <Button
             android:id="@+id/bStop"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30pt"
             android:text="Stop" />
+
+        <Button
+            android:id="@+id/bSampleConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="30pt"
+            android:layout_weight="1"
+            android:text="Sample config" />
     </LinearLayout>
 
     <EditText
@@ -33,5 +40,16 @@
         android:ems="10"
         android:gravity="start|top"
         android:inputType="textMultiLine" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="4pt"
+        android:background="#F51F9000" />
+
+    <TextView
+        android:id="@+id/tStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="idle" />
 
 </LinearLayout>

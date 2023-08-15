@@ -10,11 +10,13 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.util.Log;
 
 public class Serv extends Service {
     private static final String CHANNEL_DEFAULT_IMPORTANCE = "default";
     private static final int ONGOING_NOTIFICATION_ID = 1;
     private static Notification.Builder nb;
+    private static long instance = 0;
     private static PowerManager.WakeLock wl;
 
     @Override
@@ -29,7 +31,15 @@ public class Serv extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String config = intent.getStringExtra("config");
+        if (instance != 0) {
+            Native.destroy(instance);
+        }
+        instance = intent.getLongExtra("instance", 0);
+        if (instance == 0) {
+            this.stopForeground(true);
+            this.stopSelf();
+            return super.onStartCommand(intent, flags, startId);
+        }
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent =
@@ -47,9 +57,6 @@ public class Serv extends Service {
 
         CharSequence notiftext = getText(R.string.service_desc);
 
-        boolean failed = false;
-
-        // start here
 
         nb = new Notification.Builder(this)
                 .setContentTitle(getText(R.string.app_name))
@@ -60,23 +67,25 @@ public class Serv extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             nb.setChannelId(CHANNEL_DEFAULT_IMPORTANCE);
         }
-        if (failed) {
-            nb.setContentText("Failed to start service");
-        }
+
         Notification notification = nb.build();
 
         startForeground(ONGOING_NOTIFICATION_ID, notification);
-
-        if (failed) {
-            this.stopForeground(true);
-            this.stopSelf();
-            return super.onStartCommand(intent, flags, startId);
-        }
 
         PowerManager pm = (PowerManager)this.getSystemService(
                 Context.POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wgserver:wl");
         wl.acquire();
+
+        new Thread(() -> {
+            String ret2 = Native.run(instance);
+            if (ret2 == null || ret2.isEmpty()) {
+                Log.i("WgServer","Background thread exited without signaling failure");
+            } else {
+                Log.w("WgServer", "Background thread existed with error: " + ret2);
+            }
+            this.stopSelf();
+        }).start();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -87,6 +96,10 @@ public class Serv extends Service {
         if (wl != null) {
             wl.release();
             wl = null;
+        }
+        if (instance != 0) {
+            Native.destroy(instance);
+            instance=0;
         }
         super.onDestroy();
     }

@@ -29,3 +29,13 @@ android {
 dependencies {
 
 }
+apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
+
+cargo {
+    module  = "../wgserv"
+    libname = "wgserv"
+    // targets = ["arm", "arm64", "x86", "x86_64"]
+    targets = ["arm64"]
+    apiLevel = 21
+    profile = "release"
+}

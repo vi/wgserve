@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
@@ -26,22 +27,41 @@ public class MainActivity extends Activity {
                 EditText t = findViewById(R.id.tConfig);
                 String config = t.getText().toString();
 
-                intent.putExtra("config", config);
+                long instance = Native.create();
+                String ret = Native.setConfig(instance, config);
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    ctx.startForegroundService(intent);
+                TextView s = findViewById(R.id.tStatus);
+                if (ret != null && !ret.isEmpty()) {
+                    s.setText(ret);
                 } else {
-                    ctx.startService(intent);
+                    intent.putExtra("instance", instance);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        ctx.startForegroundService(intent);
+                    } else {
+                        ctx.startService(intent);
+                    }
+                    s.setText("started");
                 }
+
             });
         }
         {
             Button b = findViewById(R.id.bStop);
             b.setOnClickListener(view -> {
+                TextView s = findViewById(R.id.tStatus);
                 Intent intent = new Intent(ctx, Serv.class);
                 ctx.stopService(intent);
+                s.setText("stopped");
             });
         }
 
+        {
+            Button b = findViewById(R.id.bSampleConfig);
+            b.setOnClickListener(view -> {
+                EditText t = findViewById(R.id.tConfig);
+                t.setText(Native.getSampleConfig());
+            });
+        }
     }
 }
