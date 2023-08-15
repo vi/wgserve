@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">WgServer</string>
+    <string name="service_desc">WgServer</string>
 </resources>
