@@ -8,10 +8,13 @@ name="wgserv"
 crate-type=["cdylib"]
 
 [dependencies]
+anyhow = "1.0.74"
 jni = "0.21.1"
+libwgslirpy = "0.2.0"
 serde = { version = "1.0.183", features = ["derive"] }
+tokio = { version = "1.31.0", features = ["rt", "sync", "macros"] }
 toml = { version = "0.7.6" }
-tracing = "0.1.37"
+tracing = {version="0.1.37", features=["release_max_level_debug"]}
 tracing-android = "0.2.0"
 tracing-subscriber = { version = "0.3.17", default-features = false, features = ["std", "registry"] }
 
